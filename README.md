@@ -11,7 +11,7 @@ This is a Kanban app I made using Claude Code. All the FOSS tools I saw were eit
 None. I made this in 30 minutes for a need of mine. If anybody has any feature ideas, I'd love to hear them so I could try adding them. I couldn't think of any myself, but I'd love to augment this app. 
 
 # How to Use
-You can run it from the GitHub Pages link (This app stores data in local storage, and you can export your data as a JSON that you can import whenever you choose).
+You can run it via [GitHub Pages](https://reubenmenezes.github.io/kanban-app/) (This app stores data in local storage, and you can export your data as a JSON that you can import whenever you choose).
 Alternatively, you can download the files and run this app directly by opening Index.html in your browser. 
 
 Please feel free to fork this app and do whatever you wish to. I made this with AI, it's certainly not my creation to control in any way.
