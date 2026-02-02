@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-wrapper">
+        <!-- Collapsible Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <div class="logo">
+                        <i data-lucide="layout-grid" class="logo-icon"></i>
+                    </div>
+                    <span class="sidebar-title">Kanban</span>
+                </div>
+                <button id="toggleSidebar" class="sidebar-toggle" title="Collapse sidebar">
+                    <i data-lucide="panel-left-close"></i>
+                </button>
+            </div>
+
+            <div class="sidebar-content">
+                <div class="sidebar-section">
+                    <div class="sidebar-section-header">
+                        <span class="sidebar-section-title">Projects</span>
+                        <button id="addProjectBtn" class="sidebar-action-btn" title="New Project">
+                            <i data-lucide="plus"></i>
+                        </button>
+                    </div>
+                    <div id="projectList" class="project-list">
+                        <!-- Projects will be rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button id="exportAllBtn" class="sidebar-footer-btn" title="Export All Projects">
+                    <i data-lucide="download"></i>
+                    <span>Export All</span>
+                </button>
+                <label class="sidebar-footer-btn" title="Import Projects">
+                    <i data-lucide="upload"></i>
+                    <span>Import</span>
+                    <input type="file" id="importInput" accept=".json" hidden>
+                </label>
+            </div>
+        </aside>
+
+        <!-- Sidebar Collapsed Toggle -->
+        <button id="expandSidebar" class="sidebar-expand-btn" title="Expand sidebar">
+            <i data-lucide="panel-left-open"></i>
+        </button>
+
+        <div class="app-container">
+            <header class="header">
+                <div class="header-brand">
+                    <h1 id="currentProjectName">Select a Project</h1>
+                    <span class="version-badge">v2.0</span>
+                </div>
+                <div class="header-actions">
+                    <button id="managePrioritiesBtn" class="btn btn-ghost" title="Manage Priorities">
+                        <i data-lucide="flag"></i>
+                        <span>Priorities</span>
+                    </button>
+                    <button id="exportBtn" class="btn btn-ghost" title="Export Project">
+                        <i data-lucide="download"></i>
+                        <span>Export</span>
+                    </button>
+                    <div class="divider"></div>
+                    <button id="addColumnBtn" class="btn btn-primary">
+                        <i data-lucide="plus"></i>
+                        <span>New Column</span>
+                    </button>
+                </div>
+            </header>
+
+            <main class="board-container">
+                <div id="board" class="board">
+                    <!-- Columns will be rendered here -->
+                </div>
+
+                <!-- Empty state when no project selected -->
+                <div id="noProjectState" class="no-project-state">
+                    <div class="no-project-content">
+                        <i data-lucide="folder-kanban" class="no-project-icon"></i>
+                        <h2>No Project Selected</h2>
+                        <p>Select a project from the sidebar or create a new one to get started.</p>
+                        <button id="createFirstProjectBtn" class="btn btn-primary">
+                            <i data-lucide="plus"></i>
+                            <span>Create Project</span>
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Project Modal -->
+    <div id="projectModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i data-lucide="folder-plus" class="modal-icon"></i>
+                    <h2 id="projectModalTitle">New Project</h2>
+                </div>
+                <button class="close-btn" id="closeProjectModal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="projectName">
+                        <i data-lucide="type"></i>
+                        Project Name
+                    </label>
+                    <input type="text" id="projectName" placeholder="Enter project name..." required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <i data-lucide="palette"></i>
+                        Project Color
+                    </label>
+                    <div class="color-picker project-color-picker">
+                        <input type="radio" name="projectColor" value="#6366f1" id="pcolor1" checked>
+                        <label for="pcolor1" class="color-option" style="--color: #6366f1;"></label>
+                        <input type="radio" name="projectColor" value="#8b5cf6" id="pcolor2">
+                        <label for="pcolor2" class="color-option" style="--color: #8b5cf6;"></label>
+                        <input type="radio" name="projectColor" value="#ec4899" id="pcolor3">
+                        <label for="pcolor3" class="color-option" style="--color: #ec4899;"></label>
+                        <input type="radio" name="projectColor" value="#10b981" id="pcolor4">
+                        <label for="pcolor4" class="color-option" style="--color: #10b981;"></label>
+                        <input type="radio" name="projectColor" value="#f59e0b" id="pcolor5">
+                        <label for="pcolor5" class="color-option" style="--color: #f59e0b;"></label>
+                        <input type="radio" name="projectColor" value="#ef4444" id="pcolor6">
+                        <label for="pcolor6" class="color-option" style="--color: #ef4444;"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="deleteProjectBtn" class="btn btn-danger" style="display: none;">
+                    <i data-lucide="trash-2"></i>
+                    Delete
+                </button>
+                <div class="footer-spacer"></div>
+                <button id="cancelProjectBtn" class="btn btn-ghost">Cancel</button>
+                <button id="saveProjectBtn" class="btn btn-primary">
+                    <i data-lucide="check"></i>
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Modal -->
+    <div id="cardModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i data-lucide="square-pen" class="modal-icon"></i>
+                    <h2 id="modalTitle">Add Card</h2>
+                </div>
+                <button class="close-btn" id="closeModal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="cardTitle">
+                        <i data-lucide="type"></i>
+                        Title
+                    </label>
+                    <input type="text" id="cardTitle" placeholder="Enter card title..." required>
+                </div>
+                <div class="form-group">
+                    <label for="cardDescription">
+                        <i data-lucide="align-left"></i>
+                        Description
+                    </label>
+                    <textarea id="cardDescription" placeholder="Add a more detailed description..." rows="4"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cardPriority">
+                            <i data-lucide="flag"></i>
+                            Priority
+                        </label>
+                        <div class="select-wrapper">
+                            <select id="cardPriority">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="select-icon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <i data-lucide="palette"></i>
+                            Accent
+                        </label>
+                        <div class="color-picker">
+                            <input type="radio" name="cardColor" value="#1a1a2e" id="color1" checked>
+                            <label for="color1" class="color-option" style="--color: #1a1a2e;"></label>
+                            <input type="radio" name="cardColor" value="#2d2a4a" id="color2">
+                            <label for="color2" class="color-option" style="--color: #2d2a4a;"></label>
+                            <input type="radio" name="cardColor" value="#1a2e2a" id="color3">
+                            <label for="color3" class="color-option" style="--color: #1a2e2a;"></label>
+                            <input type="radio" name="cardColor" value="#1a2a3e" id="color4">
+                            <label for="color4" class="color-option" style="--color: #1a2a3e;"></label>
+                            <input type="radio" name="cardColor" value="#2e1a2a" id="color5">
+                            <label for="color5" class="color-option" style="--color: #2e1a2a;"></label>
+                            <input type="radio" name="cardColor" value="#2e2a1a" id="color6">
+                            <label for="color6" class="color-option" style="--color: #2e2a1a;"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="deleteCardBtn" class="btn btn-danger" style="display: none;">
+                    <i data-lucide="trash-2"></i>
+                    Delete
+                </button>
+                <div class="footer-spacer"></div>
+                <button id="cancelCardBtn" class="btn btn-ghost">Cancel</button>
+                <button id="saveCardBtn" class="btn btn-primary">
+                    <i data-lucide="check"></i>
+                    Save Card
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Column Modal -->
+    <div id="columnModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i data-lucide="columns" class="modal-icon"></i>
+                    <h2 id="columnModalTitle">Add Column</h2>
+                </div>
+                <button class="close-btn" id="closeColumnModal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="columnName">
+                        <i data-lucide="type"></i>
+                        Column Name
+                    </label>
+                    <input type="text" id="columnName" placeholder="Enter column name..." required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="deleteColumnBtn" class="btn btn-danger" style="display: none;">
+                    <i data-lucide="trash-2"></i>
+                    Delete
+                </button>
+                <div class="footer-spacer"></div>
+                <button id="cancelColumnBtn" class="btn btn-ghost">Cancel</button>
+                <button id="saveColumnBtn" class="btn btn-primary">
+                    <i data-lucide="check"></i>
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Priorities Modal -->
+    <div id="prioritiesModal" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i data-lucide="flag" class="modal-icon"></i>
+                    <h2>Manage Priorities</h2>
+                </div>
+                <button class="close-btn" id="closePrioritiesModal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="prioritiesList" class="priorities-list">
+                    <!-- Priorities will be rendered here -->
+                </div>
+                <div class="form-group">
+                    <label for="newPriorityName">
+                        <i data-lucide="plus"></i>
+                        Add New Priority
+                    </label>
+                    <div style="display: flex; gap: var(--space-md);">
+                        <input type="text" id="newPriorityName" placeholder="Priority name (e.g., Urgent)"
+                            style="flex: 1;">
+                        <div class="color-picker" style="display: flex; gap: var(--space-xs);">
+                            <input type="color" id="newPriorityColor" value="#ef4444">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="footer-spacer"></div>
+                <button id="cancelPrioritiesBtn" class="btn btn-ghost">Close</button>
+                <button id="addPriorityBtn" class="btn btn-primary">
+                    <i data-lucide="plus"></i>
+                    Add Priority
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i data-lucide="check-circle" class="toast-icon"></i>
+        <span class="toast-message"></span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
